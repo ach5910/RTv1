@@ -15,14 +15,14 @@
 # include "libft.h"
 # include "mlx.h"
 # include <math.h>
-# define WIDTH 200//512
-# define HEIGHT 150//384
+# define WIDTH 800//512
+# define HEIGHT 600//384
 # define mapWidth 24
 # define mapHeight 24
 # define TRAN_H	0x01
 # define TRAN_V	0x02
 # define SIGN	0x04
-# define MIN(a,b) (((a) < (b)) ? (a) : (b))
+// # define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 typedef struct		s_vec3
 {
