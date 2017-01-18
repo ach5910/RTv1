@@ -106,6 +106,10 @@ typedef struct		s_env
 int	main(int argc, char **argv);
 t_env	*init_environment(void);
 t_img	*init_image(t_env *e);
+int		ray_tracer(t_env *e);
+int		expose_hook(t_env *e);
+int		my_loop_hook(t_env *e);
+int		my_key_pressed(int keycode, t_env *e);
 // void    verLine(t_env *e, int x, int drawStart, int drawEnd, int color);
 // void    draw_lines_y(t_env *e, t_vec2 *p1, t_vec2 * p2, int color);
 // void    put_pixel_img(t_env *e, int i, int j, int color);
