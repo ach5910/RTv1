@@ -22,7 +22,7 @@
 # define TRAN_H	0x01
 # define TRAN_V	0x02
 # define SIGN	0x04
-// # define MIN(a,b) (((a) < (b)) ? (a) : (b))
+# define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 typedef struct		s_vec3
 {

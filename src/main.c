@@ -178,8 +178,8 @@ int		inter_sphere(t_ray *r, t_sphere *s, float *t)
 
 		return (0);
 	float sqr_discr = sqrtf(discr);
-	float t0 = (-B + sqr_discr) / 2;
-	float t1 = (-B - sqr_discr) / 2;
+	float t0 = (-B + sqr_discr) / (A * 2);
+	float t1 = (-B - sqr_discr) / (A * 2);
 	if (t0 > t1)
 		t0 = t1;
 	if ((t0 > 0.001f ) && (t0 < *t))
@@ -218,12 +218,12 @@ int main(int argc, char *argv[]){
 	materials[0].diffuse.red = 1;
 	materials[0].diffuse.green = 0;
 	materials[0].diffuse.blue = 0;
-	materials[0].reflection = 0.2;
+	materials[0].reflection = 0.7;//0.2;
 
 	materials[1].diffuse.red = 0;
 	materials[1].diffuse.green = 1;
 	materials[1].diffuse.blue = 0;
-	materials[1].reflection = 0.5;
+	materials[1].reflection = 0.8;//0.5;
 
 	materials[2].diffuse.red = 0;
 	materials[2].diffuse.green = 0;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]){
 	spheres[1].pos.x = 400;
 	spheres[1].pos.y = 400;
 	spheres[1].pos.z = 0;
-	spheres[1].radius = 100;
+	spheres[1].radius = 100;//100;
 	spheres[1].material = 1;
 
 	spheres[2].pos.x = 500;
@@ -299,7 +299,7 @@ int main(int argc, char *argv[]){
 			r.dir.z = 1;
 
 			int init = 1;
-			while(((coef > 0.0f) && (level < 15)) || init == 1)
+			while(((coef > 0.0001f) && (level < 50)) || init == 1)
 			{
 				init = 0;
 				/* Find closest intersection */
@@ -320,8 +320,8 @@ int main(int argc, char *argv[]){
 				/* Find the normal for this new vector at the point of intersection */
 				t_vec3 n = vec_sub(&newStart, &spheres[currentSphere].pos);
 				float temp = vec_dot(&n, &n);
-				if(temp == 0) break;
-
+				if(temp == 0)
+					break ;
 				temp = 1.0f / sqrtf(temp);
 				n = vec_scale(temp, &n);
 
@@ -329,8 +329,9 @@ int main(int argc, char *argv[]){
 				t_material currentMat = materials[spheres[currentSphere].material];
 
 				/* Find the value of the light at this point */
-				unsigned int j;
-				for(j=0; j < 3; j++){
+				int j = -1;
+				while (++j < 3)
+				{
 					t_light currentLight = lights[j];
 					t_vec3 dist = vec_sub(&currentLight.pos, &newStart);
 					if(vec_dot(&n, &dist) <= 0.0f) continue;
@@ -342,11 +343,12 @@ int main(int argc, char *argv[]){
 					lightRay.dir = vec_scale((1/t), &dist);
 
 					/* Calculate shadows */
-					bool inShadow = false;
-					unsigned int k;
-					for (k = 0; k < 3; ++k) {
+					int inShadow = 0;
+					int k = -1;
+					while (++k < 3)
+					{
 						if (inter_sphere(&lightRay, &spheres[k], &t)){
-							inShadow = true;
+							inShadow = 1;
 							break;
 						}
 					}
@@ -371,6 +373,7 @@ int main(int argc, char *argv[]){
 
 			}
 
+			printf("Level = %d\t",level);
 			int	p;
 			p = (x * 4) + (y * e->img->size_line);
 			e->img->data[p] = (char)min(red * 255.0f, 255.0f);
@@ -384,5 +387,5 @@ int main(int argc, char *argv[]){
 	mlx_destroy_image(e->mlx, e->img->i_ptr);
 	e->img->i_ptr = mlx_new_image(e->mlx, WIDTH, HEIGHT);
 	mlx_loop(e->mlx);
-return 0;
+	return 0;
 }

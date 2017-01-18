@@ -152,7 +152,7 @@ int		main(int argc, char **argv)
 			float coef = 1.0f;
 			r.start.x = x;
 			r.start.y = y;
-			r.start.z = 2000.0f;
+			r.start.z = -2000.0f;
 			r.dir.x = 0;
 			r.dir.y = 0;
 			r.dir.z = 1;
@@ -160,7 +160,7 @@ int		main(int argc, char **argv)
 			while (((coef > 0.0f) && (level < 15)) || init == 1)
 			{
 				init = 0;
-				float t = 2000.0f;
+				float t = 20000.0f;
 				int cur_sphere = -1;
 				int i = 0;
 				while (i < 3)
