@@ -207,29 +207,54 @@ int ray_tracer(t_env *e)
 {
 	t_ray r;
 
-	t_material materials[4];
+	t_material materials[9];
 	materials[0].diffuse.red = 0.3725;
 	materials[0].diffuse.green = 0.078;//0;
 	materials[0].diffuse.blue = 0.3764;//0;
-	materials[0].reflection = 0.9;
+	materials[0].reflection = 0.2f;
 
 	materials[1].diffuse.red = 255.0f / 255.0f;//0;
 	materials[1].diffuse.green = 255.0f / 255.0f;
 	materials[1].diffuse.blue = 150.0f / 255.0f;//0;
-	materials[1].reflection = 0.0;//0.5;
+	materials[1].reflection = 0.0f;//0.5;
 
 	materials[2].diffuse.red = 255.0f / 255.0f;//0;
 	materials[2].diffuse.green = 140.0f / 255.0f;//0;
 	materials[2].diffuse.blue = 0.0f / 255.0f;
-	materials[2].reflection = 0.9;
+	materials[2].reflection = 0.7f;
 
 	materials[3].diffuse.red = 152.0f / 255.0f;//0;
 	materials[3].diffuse.green = 251.0f / 255.0f;//0;
 	materials[3].diffuse.blue = 152.0f / 255.0f;
-	materials[3].reflection = 0.9;
+	materials[3].reflection = 0.2f;
+
+	materials[4].diffuse.red = 166.0f / 255.0f;//0;
+	materials[4].diffuse.green = 216.0f / 255.0f;//0;
+	materials[4].diffuse.blue = 252.0f / 255.0f;
+	materials[4].reflection = 0.01f;
+
+	materials[5].diffuse.red = 252.0f / 255.0f;//0;
+	materials[5].diffuse.green = 166.0f / 255.0f;//0;
+	materials[5].diffuse.blue = 166.0f / 255.0f;
+	materials[5].reflection = 0.5f;
+
+	materials[6].diffuse.red = 29.0f / 255.0f;//0;
+	materials[6].diffuse.green = 14.0f / 255.0f;//0;
+	materials[6].diffuse.blue = 163.0f / 255.0f;
+	materials[6].reflection = 0.3f;
+
+	materials[7].diffuse.red = 163.0f / 255.0f;//0;
+	materials[7].diffuse.green = 14.0f / 255.0f;//0;
+	materials[7].diffuse.blue = 14.0f / 255.0f;
+	materials[7].reflection = 0.05f;
+
+	materials[8].diffuse.red = 63.0f / 255.0f;//0;
+	materials[8].diffuse.green = 255.0f / 255.0f;//0;
+	materials[8].diffuse.blue = 0.0f / 255.0f;
+	materials[8].reflection = 0.05f;
 
 
-	t_sphere spheres[4];
+	t_sphere spheres[9];
 	spheres[0].pos.x = 200;
 	spheres[0].pos.y = 300;
 	spheres[0].pos.z = 0;
@@ -248,26 +273,50 @@ int ray_tracer(t_env *e)
 	spheres[2].radius = 100;
 	spheres[2].material = 2;
 
-	spheres[3].pos.x = e->posX;
-	spheres[3].pos.y = e->posY;
-	spheres[3].pos.z = 20;//0;
+	spheres[3].pos.x = 400;//e->posX;
+	spheres[3].pos.y = 300;//e->posY;
+	spheres[3].pos.z = 150;//0;
 	spheres[3].radius = 10;//100;
 	spheres[3].material = 1;
 
-	// spheres[4].pos.x = 10;
-	// spheres[4].pos.y = 10;
-	// spheres[4].pos.z = 20;//0;
-	// spheres[4].radius = 10;//100;
-	// spheres[4].material = 1;
+	spheres[4].pos.x = 100;
+	spheres[4].pos.y = 100;
+	spheres[4].pos.z = 300;//0;
+	spheres[4].radius = 30;//100;
+	spheres[4].material = 4;
 
-	t_light lights[1];
+	spheres[5].pos.x = 600;
+	spheres[5].pos.y = 100;
+	spheres[5].pos.z = -100;//0;
+	spheres[5].radius = 50;//100;
+	spheres[5].material = 5;
+
+	spheres[6].pos.x = 25;
+	spheres[6].pos.y = 500;
+	spheres[6].pos.z = -200;//0;
+	spheres[6].radius = 80;//100;
+	spheres[6].material = 6;
+
+	spheres[7].pos.x = 450;
+	spheres[7].pos.y = 525;
+	spheres[7].pos.z = 200;//0;
+	spheres[7].radius = 120;//100;
+	spheres[7].material = 7;
+
+	spheres[8].pos.x = 675;
+	spheres[8].pos.y = 340;
+	spheres[8].pos.z = 300;//0;
+	spheres[8].radius = 150;//100;
+	spheres[8].material = 8;
+
+	t_light lights[3];
 
 	lights[0].pos.x = e->posX;//0;
 	lights[0].pos.y = e->posY;//240;
-	lights[0].pos.z = 0;
-	lights[0].intensity.red = 1;
-	lights[0].intensity.green = 1;
-	lights[0].intensity.blue = 1;
+	lights[0].pos.z = e->posZ;
+	lights[0].intensity.red = 1.0f;
+	lights[0].intensity.green = 1.0f;
+	lights[0].intensity.blue = 1.0f;
 
 	// lights[1].pos.x = 10;//600;
 	// lights[1].pos.y = 10;
@@ -276,19 +325,19 @@ int ray_tracer(t_env *e)
 	// lights[1].intensity.green = 1;//0.5;
 	// lights[1].intensity.blue = 1;
 
-	// lights[1].pos.x = 3200;
-	// lights[1].pos.y = 3000;
-	// lights[1].pos.z = -1000;
-	// lights[1].intensity.red = 1.0;//0.6;
-	// lights[1].intensity.green = 1.0;//0.7;
-	// lights[1].intensity.blue = 1;
+	lights[1].pos.x = 3200;
+	lights[1].pos.y = 3000;
+	lights[1].pos.z = -1000;
+	lights[1].intensity.red = 1.0;//0.6;
+	lights[1].intensity.green = 1.0;//0.7;
+	lights[1].intensity.blue = 1;
 
-	// lights[2].pos.x = 10;//600;
-	// lights[2].pos.y = 10;
-	// lights[2].pos.z = 0;//-1000;//-100
-	// lights[2].intensity.red = 1;//0.3;
-	// lights[2].intensity.green = 1;//0.5;
-	// lights[2].intensity.blue = 1;
+	lights[2].pos.x = 10;//600;
+	lights[2].pos.y = 10;
+	lights[2].pos.z = 0;//-1000;//-100
+	lights[2].intensity.red = 1;//0.3;
+	lights[2].intensity.green = 1;//0.5;
+	lights[2].intensity.blue = 1;
 
 	/* Will contain the raw image */
 	// unsigned char img[3*WIDTH*HEIGHT];
@@ -317,7 +366,7 @@ int ray_tracer(t_env *e)
 			r.dir.z = 1;
 
 			int init = 1;
-			while(((coef > 0.0001f) && (level < 15)) || init == 1)
+			while(((coef > 0.001f) && (level < 15)) || init == 1)
 			{
 				init = 0;
 				/* Find closest intersection */
@@ -325,7 +374,7 @@ int ray_tracer(t_env *e)
 				int currentSphere = -1;
 
 				int i = -1;
-				while(++i < 4)
+				while(++i < 9)
 				{
 					if(inter_sphere(&r, &spheres[i], &t))
 						currentSphere = i;
@@ -348,7 +397,7 @@ int ray_tracer(t_env *e)
 
 				/* Find the value of the light at this point */
 				int j = -1;
-				while (++j < 1)
+				while (++j < 3)
 				{
 					t_light currentLight = lights[j];
 					t_vec3 dist = vec_sub(&currentLight.pos, &newStart);
@@ -363,7 +412,7 @@ int ray_tracer(t_env *e)
 					/* Calculate shadows */
 					int inShadow = 0;
 					int k = -1;
-					while (++k < 4)
+					while (++k < 9)
 					{
 						if (inter_sphere(&lightRay, &spheres[k], &t))
 						{
@@ -402,6 +451,11 @@ int ray_tracer(t_env *e)
 		}
 		y++;
 	}
+	int	p;
+	p = (e->posX * 4) + (e->posY * e->img->size_line);
+	e->img->data[p] = 0xFF;
+	e->img->data[++p] = 0xFF;
+	e->img->data[++p] = 0xFF;
 	mlx_put_image_to_window(e->mlx, e->win, e->img->i_ptr, 0, 0);
 	mlx_destroy_image(e->mlx, e->img->i_ptr);
 	e->img->i_ptr = mlx_new_image(e->mlx, WIDTH, HEIGHT);
@@ -426,6 +480,8 @@ int my_loop_hook(t_env *e)
 		{
 			e->posX -= 5;
 		}
+		else if (e->flags & TRAN_Z)
+			e->posZ -= 20;
 	}
 	else if (e->flags & TRAN_V)
 	{
@@ -435,6 +491,8 @@ int my_loop_hook(t_env *e)
 	{
 		e->posX += 5;
 	}
+	else if (e->flags & TRAN_Z)
+		e->posZ += 20;
 	if (e->flags)
 	{
 		e->flags = 0;
@@ -445,6 +503,7 @@ int my_loop_hook(t_env *e)
 
 int my_key_pressed(int keycode, t_env *e)
 {
+
 	if (keycode == 125)
 	{
 		e->flags |= TRAN_V;
@@ -461,5 +520,14 @@ int my_key_pressed(int keycode, t_env *e)
 	{
 		e->flags |= TRAN_H;
 	}
+	else if (keycode == 24)
+	{
+		e->flags |= TRAN_Z;
+	}
+	else if (keycode == 27)
+	{
+		e->flags |= TRAN_Z | SIGN;
+	}
+
 	return (0);
 }

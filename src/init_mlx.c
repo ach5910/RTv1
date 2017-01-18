@@ -36,6 +36,7 @@ t_env	*init_environment(void)
 	e->flags = 0;
 	e->posX = 400;
 	e->posY = 300;
+	e->posZ = 100;
 	e->img = init_image(e);
 	return (e);
 }

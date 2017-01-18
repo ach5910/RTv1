@@ -21,7 +21,8 @@
 # define mapHeight 24
 # define TRAN_H	0x01
 # define TRAN_V	0x02
-# define SIGN	0x04
+# define TRAN_Z 0x04
+# define SIGN	0x08
 # define MIN(a,b) (((a) < (b)) ? (a) : (b))
 
 typedef struct		s_vec3
@@ -95,7 +96,7 @@ typedef struct		s_env
 	unsigned int	flags;
 	double			posX;
 	double			posY;
-	double			dirX;
+	double			posZ;
 	double			dirY;
 	double			planeX;
 	double			planeY;
