@@ -190,23 +190,6 @@ int		inter_sphere(t_ray *r, t_sphere *s, float *t)
 	return (0);
 }
 
-/* Output data as PPM file */
-void saveppm(char *filename, unsigned char *img, int width, int height){
-	/* FILE pointer */
-	FILE *f;
-
-	/* Open file for writing */
-	f = fopen(filename, "w");
-
-	/* PPM header info, including the size of the image */
-	fprintf(f, "P6 %d %d %d\n", width, height, 255);
-
-	/* Write the image data to the file - remember 3 byte per pixel */
-	fwrite(img, 3, width*height, f);
-
-	/* Make sure you close the file */
-	fclose(f);
-}
 
 int main(int argc, char *argv[]){
 
@@ -218,17 +201,17 @@ int main(int argc, char *argv[]){
 	materials[0].diffuse.red = 1;
 	materials[0].diffuse.green = 0;
 	materials[0].diffuse.blue = 0;
-	materials[0].reflection = 0.7;//0.2;
+	materials[0].reflection = 0.99;
 
 	materials[1].diffuse.red = 0;
 	materials[1].diffuse.green = 1;
 	materials[1].diffuse.blue = 0;
-	materials[1].reflection = 0.8;//0.5;
+	materials[1].reflection = 0.99;//0.5;
 
 	materials[2].diffuse.red = 0;
 	materials[2].diffuse.green = 0;
 	materials[2].diffuse.blue = 1;
-	materials[2].reflection = 0.9;
+	materials[2].reflection = 0.2;
 
 	t_sphere spheres[3];
 	spheres[0].pos.x = 200;
@@ -251,8 +234,8 @@ int main(int argc, char *argv[]){
 
 	t_light lights[3];
 
-	lights[0].pos.x = 0;
-	lights[0].pos.y = 240;
+	lights[0].pos.x = 400;//0;
+	lights[0].pos.y = 300;//240;
 	lights[0].pos.z = -100;
 	lights[0].intensity.red = 1;
 	lights[0].intensity.green = 1;
@@ -261,13 +244,13 @@ int main(int argc, char *argv[]){
 	lights[1].pos.x = 3200;
 	lights[1].pos.y = 3000;
 	lights[1].pos.z = -1000;
-	lights[1].intensity.red = 0.6;
-	lights[1].intensity.green = 0.7;
+	lights[1].intensity.red = 1.0;//0.6;
+	lights[1].intensity.green = 1.0;//0.7;
 	lights[1].intensity.blue = 1;
 
 	lights[2].pos.x = 600;
 	lights[2].pos.y = 0;
-	lights[2].pos.z = -100;
+	lights[2].pos.z = -1000;//-100
 	lights[2].intensity.red = 0.3;
 	lights[2].intensity.green = 0.5;
 	lights[2].intensity.blue = 1;
@@ -373,12 +356,12 @@ int main(int argc, char *argv[]){
 
 			}
 
-			printf("Level = %d\t",level);
+			// if (level > 1 ) printf("Level = %d\t",level);
 			int	p;
 			p = (x * 4) + (y * e->img->size_line);
-			e->img->data[p] = (char)min(red * 255.0f, 255.0f);
+			e->img->data[p] = (char)min(blue * 255.0f, 255.0f);
 			e->img->data[++p] = (char)min(green * 255.0f, 255.0f);
-			e->img->data[++p] = (char)min(blue * 255.0f, 255.0f);
+			e->img->data[++p] = (char)min(red * 255.0f, 255.0f);
 			x++;
 		}
 		y++;
