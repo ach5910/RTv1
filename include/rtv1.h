@@ -15,8 +15,8 @@
 # include "libft.h"
 # include "mlx.h"
 # include <math.h>
-# define WIDTH 800//512
-# define HEIGHT 600//384
+# define WIDTH 200//512
+# define HEIGHT 150//384
 # define mapWidth 24
 # define mapHeight 24
 # define TRAN_H	0x01
@@ -60,8 +60,8 @@ typedef struct		s_material
 typedef struct		s_light
 {
 	t_vec3			pos;
-	t_color			intensityl;
-}
+	t_color			intensity;
+}					t_light;
 
 typedef struct		s_img
 {
@@ -82,8 +82,8 @@ typedef struct		s_line
 	double			i;
 	double			j;
 	double			j_incr;
-	t_vec2			*end;
-	t_vec2			*start;
+	t_vec3			*end;
+	t_vec3			*start;
 }					t_line;
 
 typedef struct		s_env
@@ -103,16 +103,16 @@ typedef struct		s_env
 	double			rotSpeed;
 }					t_env;
 
-int	main(void);
+int	main(int argc, char **argv);
 t_env	*init_environment(void);
 t_img	*init_image(t_env *e);
-void    verLine(t_env *e, int x, int drawStart, int drawEnd, int color);
-void    draw_lines_y(t_env *e, t_vec2 *p1, t_vec2 * p2, int color);
-void    put_pixel_img(t_env *e, int i, int j, int color);
-t_line	*get_line_params_y(t_env *e, t_vec2 *p1, t_vec2 *p2);
-int my_key_pressed(int k, t_env *e);
-int redraw_game(t_env *e);
-int expose_hook(t_env *e);
-int		my_loop_hook(t_env *e);
+// void    verLine(t_env *e, int x, int drawStart, int drawEnd, int color);
+// void    draw_lines_y(t_env *e, t_vec2 *p1, t_vec2 * p2, int color);
+// void    put_pixel_img(t_env *e, int i, int j, int color);
+// t_line	*get_line_params_y(t_env *e, t_vec2 *p1, t_vec2 *p2);
+// int my_key_pressed(int k, t_env *e);
+// int redraw_game(t_env *e);
+// int expose_hook(t_env *e);
+// int		my_loop_hook(t_env *e);
 
 #endif

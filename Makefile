@@ -36,7 +36,6 @@ RM = rm -rf
 
 SRC_BASE = 	main.c \
 			init_mlx.c \
-			draw.c \
 
 SRC = $(addprefix src/, $(SRC_BASE))
 
