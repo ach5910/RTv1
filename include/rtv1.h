@@ -23,6 +23,7 @@
 # define TRAN_V	0x02
 # define TRAN_Z 0x04
 # define SIGN	0x08
+# define ROT	0x10
 # define MIN(a,b) (((a) < (b)) ? (a) : (b))
 // # define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
@@ -105,7 +106,7 @@ typedef struct		s_env
 	double			posX;
 	double			posY;
 	double			posZ;
-	double			dirY;
+	double			theta;
 	double			planeX;
 	double			planeY;
 	double			moveSpeed;
