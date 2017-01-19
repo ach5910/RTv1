@@ -24,6 +24,7 @@
 # define TRAN_Z 0x04
 # define SIGN	0x08
 # define MIN(a,b) (((a) < (b)) ? (a) : (b))
+// # define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
 typedef struct		s_vec3
 {
@@ -38,6 +39,13 @@ typedef struct		s_sphere
 	float			radius;
 	int 			material;
 }					t_sphere;
+
+typedef struct		s_ellipsoid
+{
+	t_vec3			pos;
+	t_vec3			radius;
+	int 			material;
+}					t_ellipsoid;
 
 typedef struct		s_ray
 {
@@ -111,6 +119,7 @@ int		ray_tracer(t_env *e);
 int		expose_hook(t_env *e);
 int		my_loop_hook(t_env *e);
 int		my_key_pressed(int keycode, t_env *e);
+int		my_mouse_function(int button, int i, int j, t_env *e);
 // void    verLine(t_env *e, int x, int drawStart, int drawEnd, int color);
 // void    draw_lines_y(t_env *e, t_vec2 *p1, t_vec2 * p2, int color);
 // void    put_pixel_img(t_env *e, int i, int j, int color);

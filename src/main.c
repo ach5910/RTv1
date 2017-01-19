@@ -17,120 +17,6 @@
 #include <stdbool.h> /* Needed for boolean datatype */
 #include <math.h>
 
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-
-/* Width and height of out image */
-// #define WIDTH  800
-// #define HEIGHT 600
-
-// /* The vector structure */
-// typedef struct{
-// 	float x,y,z;
-// }vector;
-//
-// /* The sphere */
-// typedef struct{
-//         vector pos;
-//         float  radius;
-// 	int material;
-// }sphere;
-//
-// /* The ray */
-// typedef struct{
-//         vector start;
-//         vector dir;
-// }ray;
-//
-// /* Colour */
-// typedef struct{
-// 	float red, green, blue;
-// }colour;
-//
-// /* Material Definition */
-// typedef struct{
-// 	colour diffuse;
-// 	float reflection;
-// }material;
-//
-// /* Lightsource definition */
-// typedef struct{
-// 	vector pos;
-// 	colour intensity;
-// }light;
-//
-// /* Subtract two vectors and return the resulting vector */
-// vector vectorSub(vector *v1, vector *v2){
-// 	vector result = {v1->x - v2->x, v1->y - v2->y, v1->z - v2->z };
-// 	return result;
-// }
-//
-// /* Multiply two vectors and return the resulting scalar (dot product) */
-// float vectorDot(vector *v1, vector *v2){
-// 	return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
-// }
-//
-// /* Calculate Vector x Scalar and return resulting Vector*/
-// vector vectorScale(float c, vector *v){
-//         vector result = {v->x * c, v->y * c, v->z * c };
-//         return result;
-// }
-//
-// /* Add two vectors and return the resulting vector */
-// vector vectorAdd(vector *v1, vector *v2){
-//         vector result = {v1->x + v2->x, v1->y + v2->y, v1->z + v2->z };
-//         return result;
-// }
-//
-// /* Check if the ray and sphere intersect */
-// bool intersectRaySphere(ray *r, sphere *s, float *t){
-//
-// 	bool retval = false;
-//
-// 	/* A = d.d, the vector dot product of the direction */
-// 	float A = vectorDot(&r->dir, &r->dir);
-//
-// 	/* We need a vector representing the distance between the start of
-// 	 * the ray and the position of the circle.
-// 	 * This is the term (p0 - c)
-// 	 */
-// 	vector dist = vectorSub(&r->start, &s->pos);
-//
-// 	/* 2d.(p0 - c) */
-// 	float B = 2 * vectorDot(&r->dir, &dist);
-//
-// 	/* (p0 - c).(p0 - c) - r^2 */
-// 	float C = vectorDot(&dist, &dist) - (s->radius * s->radius);
-//
-// 	/* Solving the discriminant */
-// 	float discr = B * B - 4 * A * C;
-//
-// 	/* If the discriminant is negative, there are no real roots.
-// 	 * Return false in that case as the ray misses the sphere.
-// 	 * Return true in all other cases (can be one or two intersections)
-// 	 * t represents the distance between the start of the ray and
-// 	 * the point on the sphere where it intersects.
-// 	 */
-// 	if(discr < 0)
-// 		retval = false;
-// 	else{
-// 		float sqrtdiscr = sqrtf(discr);
-// 		float t0 = (-B + sqrtdiscr)/(2);
-// 		float t1 = (-B - sqrtdiscr)/(2);
-//
-// 		/* We want the closest one */
-// 		if(t0 > t1)
-// 			t0 = t1;
-//
-// 		/* Verify t1 larger than 0 and less than the original t */
-// 		if((t0 > 0.001f) && (t0 < *t)){
-// 			*t = t0;
-// 			retval = true;
-// 		}else
-// 			retval = false;
-// 	}
-//
-// return retval;
-// }
 
 t_vec3	vec_sub(t_vec3 *v1, t_vec3 *v2)
 {
@@ -167,6 +53,30 @@ t_vec3	vec_add(t_vec3 *v1, t_vec3 *v2)
 	return (result);
 }
 
+int		inter_ellisoid(t_ray *r, t_ellipsoid *s, float *t)
+{
+	float A = vec_dot(&r->dir, &r->dir);
+	t_vec3 dist = vec_sub(&r->start, &s->pos);
+	float B = 2 * vec_dot(&r->dir, &dist);
+	// t_vec3 dist_dot = vec_dot(&dist, &dist);
+	t_vec3 rad_dot = vec_sub(&dist, &s->radius);
+	float C = vec_dot(&rad_dot, &rad_dot);// - vec_dot(&s->radius, &s->radius);
+	float discr = B * B - 4 * A * C;
+	if (discr < 0)
+		return (0);
+	float sqr_discr = sqrtf(discr);
+	float t0 = (-B + sqr_discr) / (A * 2);
+	float t1 = (-B - sqr_discr) / (A * 2);
+	if (t0 > t1)
+		t0 = t1;
+	if ((t0 > 0.001f ) && (t0 < *t))
+	{
+		*t = t0;
+		return (1);
+	}
+	return (0);
+}
+
 int		inter_sphere(t_ray *r, t_sphere *s, float *t)
 {
 	float A = vec_dot(&r->dir, &r->dir);
@@ -177,8 +87,8 @@ int		inter_sphere(t_ray *r, t_sphere *s, float *t)
 	if (discr < 0)
 		return (0);
 	float sqr_discr = sqrtf(discr);
-	float t0 = (-B + sqr_discr) / 2;//(A * 2);
-	float t1 = (-B - sqr_discr) / 2;//(A * 2);
+	float t0 = (-B + sqr_discr) / (A * 2);
+	float t1 = (-B - sqr_discr) / (A * 2);
 	if (t0 > t1)
 		t0 = t1;
 	if ((t0 > 0.001f ) && (t0 < *t))
@@ -198,6 +108,7 @@ int main(int argc, char **argv)
 	ray_tracer(e);
 	mlx_expose_hook(e->win, expose_hook, e);
 	mlx_hook(e->win, 2, 0, my_key_pressed, e);
+	mlx_mouse_hook(e->win, my_mouse_function, e);
 	mlx_loop_hook(e->mlx, my_loop_hook, e);
 	mlx_loop(e->mlx);
 	return 0;
@@ -206,12 +117,14 @@ int main(int argc, char **argv)
 int ray_tracer(t_env *e)
 {
 	t_ray r;
+	int s_cnt = 11;
+	int l_cnt = 3;
 
-	t_material materials[9];
+	t_material materials[s_cnt];
 	materials[0].diffuse.red = 0.3725;
 	materials[0].diffuse.green = 0.078;//0;
 	materials[0].diffuse.blue = 0.3764;//0;
-	materials[0].reflection = 0.2f;
+	materials[0].reflection = 0.99f;
 
 	materials[1].diffuse.red = 255.0f / 255.0f;//0;
 	materials[1].diffuse.green = 255.0f / 255.0f;
@@ -251,10 +164,28 @@ int ray_tracer(t_env *e)
 	materials[8].diffuse.red = 63.0f / 255.0f;//0;
 	materials[8].diffuse.green = 255.0f / 255.0f;//0;
 	materials[8].diffuse.blue = 0.0f / 255.0f;
-	materials[8].reflection = 0.05f;
+	materials[8].reflection = 0.75f;
 
+	materials[9].diffuse.red = 255.0f / 255.0f;//0;
+	materials[9].diffuse.green = 0.0f / 255.0f;//0;
+	materials[9].diffuse.blue = 205.0f / 255.0f;
+	materials[9].reflection = 0.75f;
 
-	t_sphere spheres[9];
+	materials[10].diffuse.red = 255.0f / 255.0f;//0;
+	materials[10].diffuse.green = 255.0f / 255.0f;//0;
+	materials[10].diffuse.blue = 255.0f / 255.0f;
+	materials[10].reflection = 0.9f;
+
+	// t_ellipsoid ellipsoids[1];
+	// ellipsoids[0].pos.x = 200;
+	// ellipsoids[0].pos.y = 200;
+	// ellipsoids[0].pos.z = 0;
+	// ellipsoids[0].radius.x = 100;
+	// ellipsoids[0].radius.y = 50;
+	// ellipsoids[0].radius.z = 30;
+	// ellipsoids[0].material = 0;
+
+	t_sphere spheres[s_cnt];
 	spheres[0].pos.x = 200;
 	spheres[0].pos.y = 300;
 	spheres[0].pos.z = 0;
@@ -266,7 +197,7 @@ int ray_tracer(t_env *e)
 	spheres[1].pos.z = 0;
 	spheres[1].radius = 200;
 	spheres[1].material = 3;
-	
+
 	spheres[2].pos.x = 500;
 	spheres[2].pos.y = 140;
 	spheres[2].pos.z = 0;
@@ -309,13 +240,25 @@ int ray_tracer(t_env *e)
 	spheres[8].radius = 150;//100;
 	spheres[8].material = 8;
 
-	t_light lights[3];
+	spheres[9].pos.x = 300;
+	spheres[9].pos.y = 175;
+	spheres[9].pos.z = 300;//0;
+	spheres[9].radius = 70;//100;
+	spheres[9].material = 9;
+
+	spheres[10].pos.x = 200;
+	spheres[10].pos.y = 150;
+	spheres[10].pos.z = 700;//0;
+	spheres[10].radius = 130;//100;
+	spheres[10].material = 10;
+
+	t_light lights[l_cnt];
 
 	lights[0].pos.x = e->posX;//0;
 	lights[0].pos.y = e->posY;//240;
 	lights[0].pos.z = e->posZ;
 	lights[0].intensity.red = 1.0f;
-	lights[0].intensity.green = 1.0f;
+	lights[0].intensity.green = 0.0f;
 	lights[0].intensity.blue = 1.0f;
 
 	// lights[1].pos.x = 10;//600;
@@ -328,9 +271,9 @@ int ray_tracer(t_env *e)
 	lights[1].pos.x = 3200;
 	lights[1].pos.y = 3000;
 	lights[1].pos.z = -1000;
-	lights[1].intensity.red = 1.0;//0.6;
-	lights[1].intensity.green = 1.0;//0.7;
-	lights[1].intensity.blue = 1;
+	lights[1].intensity.red = 0.0;//0.6;
+	lights[1].intensity.green = 0.0;//0.7;
+	lights[1].intensity.blue = 1.0f;
 
 	lights[2].pos.x = 10;//600;
 	lights[2].pos.y = 10;
@@ -374,10 +317,13 @@ int ray_tracer(t_env *e)
 				int currentSphere = -1;
 
 				int i = -1;
-				while(++i < 9)
+				while(++i < s_cnt)
 				{
 					if(inter_sphere(&r, &spheres[i], &t))
 						currentSphere = i;
+					// if(inter_ellisoid(&r, &ellipsoids[i], &t))
+					// 	currentSphere = i;
+
 				}
 				if(currentSphere == -1) break;
 
@@ -386,6 +332,7 @@ int ray_tracer(t_env *e)
 
 				/* Find the normal for this new vector at the point of intersection */
 				t_vec3 n = vec_sub(&newStart, &spheres[currentSphere].pos);
+				// t_vec3 n = vec_sub(&newStart, &ellipsoids[currentSphere].pos);
 				float temp = vec_dot(&n, &n);
 				if(temp == 0)
 					break ;
@@ -394,17 +341,17 @@ int ray_tracer(t_env *e)
 
 				/* Find the material to determine the colour */
 				t_material currentMat = materials[spheres[currentSphere].material];
+				// t_material currentMat = materials[ellipsoids[currentSphere].material];
 
 				/* Find the value of the light at this point */
 				int j = -1;
-				while (++j < 3)
+				while (++j < l_cnt)
 				{
 					t_light currentLight = lights[j];
 					t_vec3 dist = vec_sub(&currentLight.pos, &newStart);
 					if(vec_dot(&n, &dist) <= 0.0f) continue;
 					float t = sqrtf(vec_dot(&dist,&dist));
 					if(t <= 0.0f) continue;
-
 					t_ray lightRay;
 					lightRay.start = newStart;
 					lightRay.dir = vec_scale((1/t), &dist);
@@ -412,16 +359,35 @@ int ray_tracer(t_env *e)
 					/* Calculate shadows */
 					int inShadow = 0;
 					int k = -1;
-					while (++k < 9)
+					while (++k < s_cnt)
 					{
 						if (inter_sphere(&lightRay, &spheres[k], &t))
 						{
 							inShadow = 1;
 							break;
 						}
+						// if (inter_ellisoid(&lightRay, &ellipsoids[k], &t))
+						// {
+						// 	inShadow = 1;
+						// 	break;
+						// }
 					}
 					if (!inShadow){
-						/* Lambert diffusion */
+
+						/*Blinn-Phong */
+						t_vec3 blin_dir = vec_sub(&lightRay.dir, &r.dir);
+						float bp = sqrtf(vec_dot(&blin_dir, &blin_dir));
+						float b_term = 0;
+						if (bp != 0.0f)
+						{
+							blin_dir = vec_scale((1.0f / bp), &blin_dir);
+							b_term = MAX(vec_dot(&blin_dir, &n), 0.0f);
+							b_term = currentMat.reflection * powf(b_term, 50) * coef;
+						}
+						red += b_term * currentLight.intensity.red;
+						green += b_term * currentLight.intensity.green;
+						blue += b_term * currentLight.intensity.blue;
+						// /* Lambert diffusion */
 						float lambert = vec_dot(&lightRay.dir, &n) * coef;
 						red += lambert * currentLight.intensity.red * currentMat.diffuse.red;
 						green += lambert * currentLight.intensity.green * currentMat.diffuse.green;
@@ -444,9 +410,9 @@ int ray_tracer(t_env *e)
 			// if (level > 1 ) printf("Level = %d\t",level);
 			int	p;
 			p = (x * 4) + (y * e->img->size_line);
-			e->img->data[p] = (char)min(blue * 255.0f, 255.0f);
-			e->img->data[++p] = (char)min(green * 255.0f, 255.0f);
-			e->img->data[++p] = (char)min(red * 255.0f, 255.0f);
+			e->img->data[p] = (char)MIN(blue * 255.0f, 255.0f);
+			e->img->data[++p] = (char)MIN(green * 255.0f, 255.0f);
+			e->img->data[++p] = (char)MIN(red * 255.0f, 255.0f);
 			x++;
 		}
 		y++;
@@ -498,6 +464,22 @@ int my_loop_hook(t_env *e)
 		e->flags = 0;
 		ray_tracer(e);
 	}
+	return (0);
+}
+
+int		my_mouse_function(int button, int i, int j, t_env *e)
+{
+	if (button == 1)
+	{
+		e->posX = i;
+		e->posY = j;
+	}
+	else if (button == 4)
+		e->flags |= TRAN_Z | SIGN;
+	else if (button == 5)
+		e->flags |= TRAN_Z;
+	if (button == 1 || button == 2)
+		ray_tracer(e);
 	return (0);
 }
 
