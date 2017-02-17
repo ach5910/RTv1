@@ -28,6 +28,8 @@ t_vec3	vec_sub(t_vec3 *v1, t_vec3 *v2)
 	return (result);
 }
 
+
+
 float	vec_dot(t_vec3 *v1, t_vec3 *v2)
 {
 	return (v1->x * v2->x + v1->y * v2->y + v1->z * v2->z);
@@ -51,6 +53,12 @@ t_vec3	vec_add(t_vec3 *v1, t_vec3 *v2)
 	result.y = v1->y + v2->y;
 	result.z = v1->z + v2->z;
 	return (result);
+}
+
+void normalize(t_vec3 *v)
+{
+	float mag = vec_dot(v, v);
+	*v = vec_scale((1.0f / mag), v);
 }
 
 int		inter_ellisoid(t_ray *r, t_ellipsoid *s, float *t)
@@ -77,7 +85,22 @@ int		inter_ellisoid(t_ray *r, t_ellipsoid *s, float *t)
 	return (0);
 }
 
-int		inter_sphere(t_ray *r, t_sphere *s, float *t)
+int		inter_plane(t_ray *r, t_shape *p, float *t)
+{
+	float denom = vec_dot(&p->normal, &r->dir);
+	if (denom > 0.00001f )
+	{
+		t_vec3 dist = vec_sub(&p->pos, &r->start);
+		float t0 = vec_dot(&dist, &p->normal) / denom;
+		if (t0 > 0.00001f && t0 < *t)
+		{
+			*t = t0;
+			return (1);
+		}
+	}
+	return (0);
+}
+int		inter_sphere(t_ray *r, t_shape *s, float *t)
 {
 	float A = vec_dot(&r->dir, &r->dir);
 	t_vec3 dist = vec_sub(&r->start, &s->pos);
@@ -99,6 +122,7 @@ int		inter_sphere(t_ray *r, t_sphere *s, float *t)
 	return (0);
 }
 
+t_inter inter_array[2] ={&inter_plane, &inter_sphere};
 
 int main(int argc, char **argv)
 {
@@ -117,155 +141,203 @@ int main(int argc, char **argv)
 int ray_tracer(t_env *e)
 {
 	t_ray r;
-	int s_cnt = 7;
-	int l_cnt = 3;
+	int s_cnt = 2;
+	int l_cnt = 2;
 
 	t_material materials[s_cnt];
-	materials[0].diffuse.red = 0.3725;
-	materials[0].diffuse.green = 0.078;//0;
-	materials[0].diffuse.blue = 0.3764;//0;
-	materials[0].reflection = 0.99f;
-
+	materials[0].diffuse.red = 0.3725f;
+	materials[0].diffuse.green = 0.078f;//0;
+	materials[0].diffuse.blue = 0.3764f;//0;
+	materials[0].reflection = 0.9f;
+	//
 	materials[1].diffuse.red = 255.0f / 255.0f;//0;
 	materials[1].diffuse.green = 255.0f / 255.0f;
 	materials[1].diffuse.blue = 150.0f / 255.0f;//0;
 	materials[1].reflection = 0.8f;//0.5;
-
+	//
 	materials[2].diffuse.red = 255.0f / 255.0f;//0;
 	materials[2].diffuse.green = 140.0f / 255.0f;//0;
 	materials[2].diffuse.blue = 0.0f / 255.0f;
 	materials[2].reflection = 0.7f;
-
-	materials[3].diffuse.red = 152.0f / 255.0f;//0;
-	materials[3].diffuse.green = 251.0f / 255.0f;//0;
-	materials[3].diffuse.blue = 152.0f / 255.0f;
-	materials[3].reflection = 0.2f;
-
-	materials[4].diffuse.red = 166.0f / 255.0f;//0;
-	materials[4].diffuse.green = 216.0f / 255.0f;//0;
-	materials[4].diffuse.blue = 252.0f / 255.0f;
-	materials[4].reflection = 0.7f;
 	//
-	materials[5].diffuse.red = 252.0f / 255.0f;//0;
-	materials[5].diffuse.green = 166.0f / 255.0f;//0;
-	materials[5].diffuse.blue = 166.0f / 255.0f;
-	materials[5].reflection = 0.5f;
+	// materials[3].diffuse.red = 152.0f / 255.0f;//0;
+	// materials[3].diffuse.green = 251.0f / 255.0f;//0;
+	// materials[3].diffuse.blue = 152.0f / 255.0f;
+	// materials[3].reflection = 0.2f;
 	//
-	materials[6].diffuse.red = 29.0f / 255.0f;//0;
-	materials[6].diffuse.green = 14.0f / 255.0f;//0;
-	materials[6].diffuse.blue = 163.0f / 255.0f;
-	materials[6].reflection = 0.9f;
-
-	// materials[7].diffuse.red = 163.0f / 255.0f;//0;
-	// materials[7].diffuse.green = 14.0f / 255.0f;//0;
-	// materials[7].diffuse.blue = 14.0f / 255.0f;
-	// materials[7].reflection = 0.05f;
+	// materials[4].diffuse.red = 166.0f / 255.0f;//0;
+	// materials[4].diffuse.green = 216.0f / 255.0f;//0;
+	// materials[4].diffuse.blue = 252.0f / 255.0f;
+	// materials[4].reflection = 0.7f;
+	// //
+	// materials[5].diffuse.red = 252.0f / 255.0f;//0;
+	// materials[5].diffuse.green = 166.0f / 255.0f;//0;
+	// materials[5].diffuse.blue = 166.0f / 255.0f;
+	// materials[5].reflection = 0.5f;
+	// //
+	// materials[6].diffuse.red = 29.0f / 255.0f;//0;
+	// materials[6].diffuse.green = 14.0f / 255.0f;//0;
+	// materials[6].diffuse.blue = 163.0f / 255.0f;
+	// materials[6].reflection = 0.9f;
 	//
-	// materials[8].diffuse.red = 63.0f / 255.0f;//0;
-	// materials[8].diffuse.green = 255.0f / 255.0f;//0;
-	// materials[8].diffuse.blue = 0.0f / 255.0f;
-	// materials[8].reflection = 0.75f;
 	//
-	// materials[9].diffuse.red = 255.0f / 255.0f;//0;
-	// materials[9].diffuse.green = 0.0f / 255.0f;//0;
-	// materials[9].diffuse.blue = 205.0f / 255.0f;
-	// materials[9].reflection = 0.75f;
 	//
-	// materials[10].diffuse.red = 255.0f / 255.0f;//0;
-	// materials[10].diffuse.green = 255.0f / 255.0f;//0;
-	// materials[10].diffuse.blue = 255.0f / 255.0f;
-	// materials[10].reflection = 0.9f;
-
-	// t_ellipsoid ellipsoids[1];
-	// ellipsoids[0].pos.x = 200;
-	// ellipsoids[0].pos.y = 200;
-	// ellipsoids[0].pos.z = 0;
-	// ellipsoids[0].radius.x = 100;
-	// ellipsoids[0].radius.y = 50;
-	// ellipsoids[0].radius.z = 30;
-	// ellipsoids[0].material = 0;
-
-	t_sphere spheres[s_cnt];
-	spheres[0].pos.x = 300 * cos(M_PI / 4 + e->theta);
-	spheres[0].pos.y = 300;
-	spheres[0].pos.z = 300 * sin(M_PI / 4 + e->theta);
-	spheres[0].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
-	spheres[0].material = 0;
-
-	spheres[1].pos.x = 350 * cos(M_PI / 2 + e->theta);
-	spheres[1].pos.y = 500;
-	spheres[1].pos.z = 350 * sin(M_PI / 2 + e->theta);
-	spheres[1].radius = 50 - (45 * sin(M_PI / 2 + e->theta));
-	spheres[1].material = 1;
-
-	spheres[2].pos.x = 200 * cos(e->theta);
-	spheres[2].pos.y = 140;
-	spheres[2].pos.z = 200 * sin(e->theta);
-	spheres[2].radius = 25 - (20 * sin(e->theta));
-	spheres[2].material = 2;
-
-	spheres[3].pos.x = 200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
-	spheres[3].pos.y = 300;//e->posY;
-	spheres[3].pos.z = 200 * sin(3 * M_PI / 4 + e->theta);//0;
-	spheres[3].radius = 60 - (55 * sin(3 * M_PI / 4 + e->theta));//100;
-	spheres[3].material = 3;
-
-	spheres[4].pos.x = -200 * cos(3 * M_PI / 2 + e->theta);
-	spheres[4].pos.y = 100;
-	spheres[4].pos.z = -200 * sin(3 * M_PI / 2 + e->theta);//0;
-	spheres[4].radius = 35 - (30 * sin(3 * M_PI / 2 + e->theta));//100;
-	spheres[4].material = 4;
-
-	spheres[5].pos.x = -200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
-	spheres[5].pos.y = 400;//e->posY;
-	spheres[5].pos.z = -200 * sin(3 * M_PI / 4 + e->theta);//0;
-	spheres[5].radius = 60 + (55 * sin(3 * M_PI / 4 + e->theta));//100;
-	spheres[5].material = 5;
-
-	spheres[6].pos.x = -300 * cos(M_PI / 4 + e->theta);
-	spheres[6].pos.y = 500;
-	spheres[6].pos.z = -300 * sin(M_PI / 4 + e->theta);
-	spheres[6].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
-	spheres[6].material = 6;
+	// //below commented out before plane
 	//
-	// spheres[5].pos.x = 600;
-	// spheres[5].pos.y = 100;
-	// spheres[5].pos.z = -100;//0;
-	// spheres[5].radius = 50;//100;
+	//
+	// // materials[7].diffuse.red = 163.0f / 255.0f;//0;
+	// // materials[7].diffuse.green = 14.0f / 255.0f;//0;
+	// // materials[7].diffuse.blue = 14.0f / 255.0f;
+	// // materials[7].reflection = 0.05f;
+	// //
+	// // materials[8].diffuse.red = 63.0f / 255.0f;//0;
+	// // materials[8].diffuse.green = 255.0f / 255.0f;//0;
+	// // materials[8].diffuse.blue = 0.0f / 255.0f;
+	// // materials[8].reflection = 0.75f;
+	// //
+	// // materials[9].diffuse.red = 255.0f / 255.0f;//0;
+	// // materials[9].diffuse.green = 0.0f / 255.0f;//0;
+	// // materials[9].diffuse.blue = 205.0f / 255.0f;
+	// // materials[9].reflection = 0.75f;
+	// //
+	// // materials[10].diffuse.red = 255.0f / 255.0f;//0;
+	// // materials[10].diffuse.green = 255.0f / 255.0f;//0;
+	// // materials[10].diffuse.blue = 255.0f / 255.0f;
+	// // materials[10].reflection = 0.9f;
+	//
+	// // t_ellipsoid ellipsoids[1];
+	// // ellipsoids[0].pos.x = 200;
+	// // ellipsoids[0].pos.y = 200;
+	// // ellipsoids[0].pos.z = 0;
+	// // ellipsoids[0].radius.x = 100;
+	// // ellipsoids[0].radius.y = 50;
+	// // ellipsoids[0].radius.z = 30;
+	// // ellipsoids[0].material = 0;
+
+	// t_shape planes[s_cnt];
+	// planes[0].pos.x = 0.0f;
+	// planes[0].pos.y = 0.0f;
+	// planes[0].pos.z = 10000.0f;
+	// planes[0].normal.x = 0.0f;
+	// planes[0].normal.y = 1.00f;
+	// planes[0].normal.z =  1.00f;
+	// normalize(&planes[0].normal);
+	// planes[0].material = 0;
+	// printf("x = %f y = %f z = %f\n",planes[0].normal.x, planes[0].normal.y, planes[0].normal.z );
+
+	t_shape shapes[s_cnt];
+	shapes[0].shape = PLANE;
+	shapes[0].pos.x = 0.0f;
+	shapes[0].pos.y = 0.0f;
+	shapes[0].pos.z = 300.0f;
+	shapes[0].normal = shapes[0].pos;
+	normalize(&shapes[0].normal);
+	shapes[0].material = 0;
+	printf("x = %f y = %f z = %f\n",shapes[0].normal.x, shapes[0].normal.y, shapes[0].normal.z );
+
+	shapes[1].shape = SPHERE;
+	shapes[1].pos.x = 500 ;//* cos(M_PI / 4 + e->theta);
+	shapes[1].pos.y = 100;
+	shapes[1].pos.z = 300 ;//* sin(M_PI / 4 + e->theta);
+	shapes[1].radius = 100;//75 - (70 * sin(M_PI / 4 + e->theta)) ;
+	shapes[1].material = 1;
+
+	// shapes[2].shape = PLANE;
+	// shapes[2].pos.x = WIDTH / 2;
+	// shapes[2].pos.y = 0;
+	// shapes[2].pos.z = 300.0f;
+	// shapes[2].normal.x = 0.0f;
+	// shapes[2].normal.y = 0.0f;
+	// shapes[2].normal.z =  1.0f;
+	// normalize(&shapes[2].normal);
+	// shapes[2].material = 2;
+	// t_sphere spheres[s_cnt];
+	// spheres[0].pos.x = 300 * cos(M_PI / 4 + e->theta);
+	// spheres[0].pos.y = 300;
+	// spheres[0].pos.z = 300 * sin(M_PI / 4 + e->theta);
+	// spheres[0].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
+	// spheres[0].material = 0;
+	//
+	// spheres[1].pos.x = 350 * cos(M_PI / 2 + e->theta);
+	// spheres[1].pos.y = 500;
+	// spheres[1].pos.z = 350 * sin(M_PI / 2 + e->theta);
+	// spheres[1].radius = 50 - (45 * sin(M_PI / 2 + e->theta));
+	// spheres[1].material = 1;
+	//
+	// spheres[2].pos.x = 200 * cos(e->theta);
+	// spheres[2].pos.y = 140;
+	// spheres[2].pos.z = 200 * sin(e->theta);
+	// spheres[2].radius = 25 - (20 * sin(e->theta));
+	// spheres[2].material = 2;
+	//
+	// spheres[3].pos.x = 200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
+	// spheres[3].pos.y = 300;//e->posY;
+	// spheres[3].pos.z = 200 * sin(3 * M_PI / 4 + e->theta);//0;
+	// spheres[3].radius = 60 - (55 * sin(3 * M_PI / 4 + e->theta));//100;
+	// spheres[3].material = 3;
+	//
+	// spheres[4].pos.x = -200 * cos(3 * M_PI / 2 + e->theta);
+	// spheres[4].pos.y = 100;
+	// spheres[4].pos.z = -200 * sin(3 * M_PI / 2 + e->theta);//0;
+	// spheres[4].radius = 35 - (30 * sin(3 * M_PI / 2 + e->theta));//100;
+	// spheres[4].material = 4;
+	//
+	// spheres[5].pos.x = -200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
+	// spheres[5].pos.y = 400;//e->posY;
+	// spheres[5].pos.z = -200 * sin(3 * M_PI / 4 + e->theta);//0;
+	// spheres[5].radius = 60 + (55 * sin(3 * M_PI / 4 + e->theta));//100;
 	// spheres[5].material = 5;
 	//
-	// spheres[6].pos.x = 25;
+	// spheres[6].pos.x = -300 * cos(M_PI / 4 + e->theta);
 	// spheres[6].pos.y = 500;
-	// spheres[6].pos.z = -200;//0;
-	// spheres[6].radius = 80;//100;
+	// spheres[6].pos.z = -300 * sin(M_PI / 4 + e->theta);
+	// spheres[6].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
 	// spheres[6].material = 6;
-	//
-	// spheres[7].pos.x = 450;
-	// spheres[7].pos.y = 525;
-	// spheres[7].pos.z = 200;//0;
-	// spheres[7].radius = 120;//100;
-	// spheres[7].material = 7;
-	//
-	// spheres[8].pos.x = 675;
-	// spheres[8].pos.y = 340;
-	// spheres[8].pos.z = 300;//0;
-	// spheres[8].radius = 150;//100;
-	// spheres[8].material = 8;
-	//
-	// spheres[9].pos.x = 300;
-	// spheres[9].pos.y = 175;
-	// spheres[9].pos.z = 300;//0;
-	// spheres[9].radius = 70;//100;
-	// spheres[9].material = 9;
-	//
-	// spheres[10].pos.x = 200;
-	// spheres[10].pos.y = 150;
-	// spheres[10].pos.z = 700;//0;
-	// spheres[10].radius = 130;//100;
-	// spheres[10].material = 10;
+	// //
+	// // spheres[5].pos.x = 600;
+	// // spheres[5].pos.y = 100;
+	// // spheres[5].pos.z = -100;//0;
+	// // spheres[5].radius = 50;//100;
+	// // spheres[5].material = 5;
+	// //
+	// // spheres[6].pos.x = 25;
+	// // spheres[6].pos.y = 500;
+	// // spheres[6].pos.z = -200;//0;
+	// // spheres[6].radius = 80;//100;
+	// // spheres[6].material = 6;
+	// //
+	// // spheres[7].pos.x = 450;
+	// // spheres[7].pos.y = 525;
+	// // spheres[7].pos.z = 200;//0;
+	// // spheres[7].radius = 120;//100;
+	// // spheres[7].material = 7;
+	// //
+	// // spheres[8].pos.x = 675;
+	// // spheres[8].pos.y = 340;
+	// // spheres[8].pos.z = 300;//0;
+	// // spheres[8].radius = 150;//100;
+	// // spheres[8].material = 8;
+	// //
+	// // spheres[9].pos.x = 300;
+	// // spheres[9].pos.y = 175;
+	// // spheres[9].pos.z = 300;//0;
+	// // spheres[9].radius = 70;//100;
+	// // spheres[9].material = 9;
+	// //
+	// // spheres[10].pos.x = 200;
+	// // spheres[10].pos.y = 150;
+	// // spheres[10].pos.z = 700;//0;
+	// // spheres[10].radius = 130;//100;
+	// // spheres[10].material = 10;
 
 	t_light lights[l_cnt];
 
+	// lights[0].pos.x = 0;//0;
+	// lights[0].pos.y = HEIGHT / 2;//240;
+	// lights[0].pos.z = -1500;
+	// lights[0].intensity.red = 1.0f;
+	// lights[0].intensity.green = 1.0f;
+	// lights[0].intensity.blue = 1.0f;
 	lights[0].pos.x = e->posX;//0;
 	lights[0].pos.y = e->posY;//240;
 	lights[0].pos.z = e->posZ;
@@ -273,9 +345,10 @@ int ray_tracer(t_env *e)
 	lights[0].intensity.green = 1.0f;
 	lights[0].intensity.blue = 1.0f;
 
-	lights[1].pos.x = 10;//600;
-	lights[1].pos.y = 10;
-	lights[1].pos.z = 0;//-1000;//-100
+	// ft_printf("x %d  y %d  z %d\n", (int)e->posX, (int)e->posY, (int)e->posZ );
+	lights[1].pos.x = 900;//600;
+	lights[1].pos.y = 1000;
+	lights[1].pos.z = -1000;//-1000;//-100
 	lights[1].intensity.red = 1;//0.3;
 	lights[1].intensity.green = 1;//0.5;
 	lights[1].intensity.blue = 1;
@@ -286,13 +359,13 @@ int ray_tracer(t_env *e)
 	// lights[1].intensity.red = 1.0;//0.6;
 	// lights[1].intensity.green = 1.0;//0.7;
 	// lights[1].intensity.blue = 1.0f;
-	//
-	lights[2].pos.x = 700;//600;
-	lights[2].pos.y = 500;
-	lights[2].pos.z = -3000;//-1000;//-100
-	lights[2].intensity.red = 1;//0.3;
-	lights[2].intensity.green = 1;//0.5;
-	lights[2].intensity.blue = 1;
+	// //
+	// lights[2].pos.x = 700;//600;
+	// lights[2].pos.y = 500;
+	// lights[2].pos.z = -3000;//-1000;//-100
+	// lights[2].intensity.red = 1;//0.3;
+	// lights[2].intensity.green = 1;//0.5;
+	// lights[2].intensity.blue = 1;
 
 	/* Will contain the raw image */
 	// unsigned char img[3*WIDTH*HEIGHT];
@@ -305,33 +378,51 @@ int ray_tracer(t_env *e)
 		while (x < WIDTH)
 		{
 
-			float red = 0;
-			float green = 0;
-			float blue = 0;
+			float red = 0.0f;
+			float green = 0.0f;
+			float blue = 0.0f;
 
 			int level = 0;
-			float coef = 1.0;
+			float coef = 1.0f;
 
-			r.start.x = x - (WIDTH / 2);
-			r.start.y = y;
-			r.start.z = -2000;
+			//Had this set for sphere rotations
+			// r.start.x = x - (WIDTH / 2);
+			r.start.x = x;// - (WIDTH / 2);//(x - WIDTH / 2) + 0.5f;//(-WIDTH / 2) + x + 0.5;
+			r.start.y = y;// - (HEIGHT / 2);//(y - HEIGHT / 2) + 0.5f; //(HEIGHT / 2) - y + 0.5;
+			r.start.z = -2000.0f;
 
-			r.dir.x = 0;
-			r.dir.y = 0;
-			r.dir.z = 1;
+
+
+			// float mag = vec_dot(&st_dir, &st_dir);
+			// r.dir = vec_scale((1.0f / mag), &st_dir);
+			r.dir.x = 0.0f;//+ 0.5;
+			r.dir.y = 0.0f;//+ 0.5;
+			r.dir.z = 1.0f;//HEIGHT / (2.0f * tanf(0.2));
+			// if (x % (WIDTH / 4) == 0)printf("x = %f y = %f z = %f\n",r.dir.x, r.dir.y, r.dir.z );
+			normalize(&r.dir);
+			// r.dir = vec_scale(10, &r.dir);
+			// if (x % (WIDTH / 4) == 0)printf("x = %f y = %f z = %f\n",r.dir.x, r.dir.y, r.dir.z );
+
+
 
 			int init = 1;
 			while(((coef > 0.001f) && (level < 15)) || init == 1)
 			{
 				init = 0;
 				/* Find closest intersection */
-				float t = 20000.0f;
+				float t = 200000.0f;
 				int currentSphere = -1;
 
 				int i = -1;
 				while(++i < s_cnt)
 				{
-					if(inter_sphere(&r, &spheres[i], &t))
+					// if(inter_sphere(&r, &spheres[i], &t))
+					// 	currentSphere = i;
+					// if(inter_plane(&r, &planes[i], &t))
+					// 	currentSphere = i;
+					t_inter is_intersecting;
+					is_intersecting = inter_array[shapes[i].shape];
+					if(is_intersecting(&r, &shapes[i], &t))
 						currentSphere = i;
 					// if(inter_ellisoid(&r, &ellipsoids[i], &t))
 					// 	currentSphere = i;
@@ -343,16 +434,22 @@ int ray_tracer(t_env *e)
 				t_vec3 newStart = vec_add(&r.start, &scaled);
 
 				/* Find the normal for this new vector at the point of intersection */
-				t_vec3 n = vec_sub(&newStart, &spheres[currentSphere].pos);
+				// t_vec3 n = vec_sub(&newStart, &spheres[currentSphere].pos);
+
+				t_vec3 n = vec_sub(&newStart, &shapes[currentSphere].pos);
+
+				// t_vec3 n = planes[currentSphere].normal;
 				// t_vec3 n = vec_sub(&newStart, &ellipsoids[currentSphere].pos);
+
 				float temp = vec_dot(&n, &n);
-				if(temp == 0)
+				if(temp < 0.001f)
 					break ;
 				temp = 1.0f / sqrtf(temp);
 				n = vec_scale(temp, &n);
 
 				/* Find the material to determine the colour */
-				t_material currentMat = materials[spheres[currentSphere].material];
+				// t_material currentMat = materials[spheres[currentSphere].material];
+				t_material currentMat = materials[shapes[currentSphere].material];
 				// t_material currentMat = materials[ellipsoids[currentSphere].material];
 
 				/* Find the value of the light at this point */
@@ -361,19 +458,26 @@ int ray_tracer(t_env *e)
 				{
 					t_light currentLight = lights[j];
 					t_vec3 dist = vec_sub(&currentLight.pos, &newStart);
-					if(vec_dot(&n, &dist) <= 0.0f) continue;
+					if(vec_dot(&n, &dist) <= 0.001f) continue;
 					float t = sqrtf(vec_dot(&dist,&dist));
-					if(t <= 0.0f) continue;
+					if(t <= 0.001f) continue;
 					t_ray lightRay;
 					lightRay.start = newStart;
-					lightRay.dir = vec_scale((1/t), &dist);
+					lightRay.dir = vec_scale((1.0f / t), &dist);
 
 					/* Calculate shadows */
 					int inShadow = 0;
 					int k = -1;
 					while (++k < s_cnt)
 					{
-						if (inter_sphere(&lightRay, &spheres[k], &t))
+						// if (inter_sphere(&lightRay, &spheres[k], &t))
+						// {
+						// 	inShadow = 1;
+						// 	break;
+						// }
+						t_inter is_intersecting;
+						is_intersecting = inter_array[shapes[k].shape];
+						if(is_intersecting(&lightRay, &shapes[k], &t))
 						{
 							inShadow = 1;
 							break;
@@ -389,22 +493,27 @@ int ray_tracer(t_env *e)
 						/*Blinn-Phong */
 						t_vec3 blin_dir = vec_sub(&lightRay.dir, &r.dir);
 						float bp = sqrtf(vec_dot(&blin_dir, &blin_dir));
-						float b_term = 0;
-						if (bp != 0.0f)
+						float b_term = 0.0f;
+						if (bp > 0.001f)
 						{
+							printf("bp = %f\n", bp);
 							blin_dir = vec_scale((1.0f / bp), &blin_dir);
 							b_term = MAX(vec_dot(&blin_dir, &n), 0.0f);
-							b_term = currentMat.reflection * powf(b_term, 50) * coef;
+							b_term = currentMat.reflection * powf(b_term, 16) * coef;
 						}
 						red += b_term * currentLight.intensity.red;
 						green += b_term * currentLight.intensity.green;
 						blue += b_term * currentLight.intensity.blue;
 						// /* Lambert diffusion */
-						float lambert = vec_dot(&lightRay.dir, &n) * coef;
+						float lambert = MAX(vec_dot(&lightRay.dir, &n), 0.0f) * coef;
 						red += lambert * currentLight.intensity.red * currentMat.diffuse.red;
 						green += lambert * currentLight.intensity.green * currentMat.diffuse.green;
 						blue += lambert * currentLight.intensity.blue * currentMat.diffuse.blue;
 					}
+					// float ambient = 0.01f;
+					// red += ambient;
+					// green += ambient;
+					// blue += ambient;
 				}
 				/* Iterate over the reflection */
 				coef *= currentMat.reflection;
@@ -429,6 +538,8 @@ int ray_tracer(t_env *e)
 		}
 		y++;
 	}
+
+	// drawing the pixel that shows the location of the light source
 	int	p;
 	p = (e->posX * 4) + (e->posY * e->img->size_line);
 	e->img->data[p] = 0xFF;

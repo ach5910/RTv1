@@ -34,9 +34,9 @@ t_env	*init_environment(void)
 	mlx_do_key_autorepeatoff(e->mlx);
 	e->win = mlx_new_window(e->mlx, WIDTH, HEIGHT, "RTv1");
 	e->flags = 0;
-	e->posX = 0;
-	e->posY = 300;
-	e->posZ = 100;
+	e->posX = 0.0f;
+	e->posY = 0.0f;
+	e->posZ = -500.0f;
 	e->theta = 0;
 	e->img = init_image(e);
 	return (e);

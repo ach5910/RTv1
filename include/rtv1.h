@@ -24,8 +24,11 @@
 # define TRAN_Z 0x04
 # define SIGN	0x08
 # define ROT	0x10
+# define PLANE  0x00
+# define SPHERE	0x01
 # define MIN(a,b) (((a) < (b)) ? (a) : (b))
 // # define MAX(a,b) (((a) > (b)) ? (a) : (b))
+
 
 typedef struct		s_vec3
 {
@@ -34,12 +37,28 @@ typedef struct		s_vec3
 	float			z;
 }					t_vec3;
 
-typedef struct		s_sphere
+typedef struct		s_shape
 {
-	t_vec3			pos;
-	float			radius;
-	int 			material;
-}					t_sphere;
+	int			shape;
+	t_vec3		pos;
+	t_vec3		normal;
+	float		radius;
+	int			material;
+}					t_shape;
+
+// typedef struct		s_sphere
+// {
+// 	t_vec3			pos;
+// 	float			radius;
+// 	int 			material;
+// }					t_sphere;
+//
+// typedef struct		s_plane
+// {
+// 	t_vec3			pos;
+// 	t_vec3			normal;
+// 	int				material;
+// }					t_plane;
 
 typedef struct		s_ellipsoid
 {
@@ -53,6 +72,8 @@ typedef struct		s_ray
 	t_vec3			start;
 	t_vec3			dir;
 }					t_ray;
+
+typedef int	(*t_inter)(t_ray*, t_shape*, float*);
 
 typedef struct		s_color
 {
