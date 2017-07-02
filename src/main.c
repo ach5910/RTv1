@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 int ray_tracer(t_env *e)
 {
 	t_ray r;
-	int s_cnt = 2;
+	int s_cnt = 7;
 	int l_cnt = 2;
 
 	t_material materials[s_cnt];
@@ -160,25 +160,25 @@ int ray_tracer(t_env *e)
 	materials[2].diffuse.blue = 0.0f / 255.0f;
 	materials[2].reflection = 0.7f;
 	//
-	// materials[3].diffuse.red = 152.0f / 255.0f;//0;
-	// materials[3].diffuse.green = 251.0f / 255.0f;//0;
-	// materials[3].diffuse.blue = 152.0f / 255.0f;
-	// materials[3].reflection = 0.2f;
+	materials[3].diffuse.red = 152.0f / 255.0f;//0;
+	materials[3].diffuse.green = 251.0f / 255.0f;//0;
+	materials[3].diffuse.blue = 152.0f / 255.0f;
+	materials[3].reflection = 0.2f;
+	
+	materials[4].diffuse.red = 166.0f / 255.0f;//0;
+	materials[4].diffuse.green = 216.0f / 255.0f;//0;
+	materials[4].diffuse.blue = 252.0f / 255.0f;
+	materials[4].reflection = 0.7f;
 	//
-	// materials[4].diffuse.red = 166.0f / 255.0f;//0;
-	// materials[4].diffuse.green = 216.0f / 255.0f;//0;
-	// materials[4].diffuse.blue = 252.0f / 255.0f;
-	// materials[4].reflection = 0.7f;
-	// //
-	// materials[5].diffuse.red = 252.0f / 255.0f;//0;
-	// materials[5].diffuse.green = 166.0f / 255.0f;//0;
-	// materials[5].diffuse.blue = 166.0f / 255.0f;
-	// materials[5].reflection = 0.5f;
-	// //
-	// materials[6].diffuse.red = 29.0f / 255.0f;//0;
-	// materials[6].diffuse.green = 14.0f / 255.0f;//0;
-	// materials[6].diffuse.blue = 163.0f / 255.0f;
-	// materials[6].reflection = 0.9f;
+	materials[5].diffuse.red = 252.0f / 255.0f;//0;
+	materials[5].diffuse.green = 166.0f / 255.0f;//0;
+	materials[5].diffuse.blue = 166.0f / 255.0f;
+	materials[5].reflection = 0.5f;
+	//
+	materials[6].diffuse.red = 29.0f / 255.0f;//0;
+	materials[6].diffuse.green = 14.0f / 255.0f;//0;
+	materials[6].diffuse.blue = 163.0f / 255.0f;
+	materials[6].reflection = 0.9f;
 	//
 	//
 	//
@@ -225,22 +225,22 @@ int ray_tracer(t_env *e)
 	// planes[0].material = 0;
 	// printf("x = %f y = %f z = %f\n",planes[0].normal.x, planes[0].normal.y, planes[0].normal.z );
 
-	t_shape shapes[s_cnt];
-	shapes[0].shape = PLANE;
-	shapes[0].pos.x = 0.0f;
-	shapes[0].pos.y = 0.0f;
-	shapes[0].pos.z = 300.0f;
-	shapes[0].normal = shapes[0].pos;
-	normalize(&shapes[0].normal);
-	shapes[0].material = 0;
-	printf("x = %f y = %f z = %f\n",shapes[0].normal.x, shapes[0].normal.y, shapes[0].normal.z );
+	// t_shape shapes[s_cnt];
+	// shapes[0].shape = PLANE;
+	// shapes[0].pos.x = 0.0f;
+	// shapes[0].pos.y = 0.0f;
+	// shapes[0].pos.z = 300.0f;
+	// shapes[0].normal = shapes[0].pos;
+	// normalize(&shapes[0].normal);
+	// shapes[0].material = 0;
+	// printf("x = %f y = %f z = %f\n",shapes[0].normal.x, shapes[0].normal.y, shapes[0].normal.z );
 
-	shapes[1].shape = SPHERE;
-	shapes[1].pos.x = 500 ;//* cos(M_PI / 4 + e->theta);
-	shapes[1].pos.y = 100;
-	shapes[1].pos.z = 300 ;//* sin(M_PI / 4 + e->theta);
-	shapes[1].radius = 100;//75 - (70 * sin(M_PI / 4 + e->theta)) ;
-	shapes[1].material = 1;
+	// shapes[1].shape = SPHERE;
+	// shapes[1].pos.x = 500 ;//* cos(M_PI / 4 + e->theta);
+	// shapes[1].pos.y = 100;
+	// shapes[1].pos.z = 300 ;//* sin(M_PI / 4 + e->theta);
+	// shapes[1].radius = 100;//75 - (70 * sin(M_PI / 4 + e->theta)) ;
+	// shapes[1].material = 1;
 
 	// shapes[2].shape = PLANE;
 	// shapes[2].pos.x = WIDTH / 2;
@@ -251,48 +251,55 @@ int ray_tracer(t_env *e)
 	// shapes[2].normal.z =  1.0f;
 	// normalize(&shapes[2].normal);
 	// shapes[2].material = 2;
-	// t_sphere spheres[s_cnt];
-	// spheres[0].pos.x = 300 * cos(M_PI / 4 + e->theta);
-	// spheres[0].pos.y = 300;
-	// spheres[0].pos.z = 300 * sin(M_PI / 4 + e->theta);
-	// spheres[0].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
-	// spheres[0].material = 0;
-	//
-	// spheres[1].pos.x = 350 * cos(M_PI / 2 + e->theta);
-	// spheres[1].pos.y = 500;
-	// spheres[1].pos.z = 350 * sin(M_PI / 2 + e->theta);
-	// spheres[1].radius = 50 - (45 * sin(M_PI / 2 + e->theta));
-	// spheres[1].material = 1;
-	//
-	// spheres[2].pos.x = 200 * cos(e->theta);
-	// spheres[2].pos.y = 140;
-	// spheres[2].pos.z = 200 * sin(e->theta);
-	// spheres[2].radius = 25 - (20 * sin(e->theta));
-	// spheres[2].material = 2;
-	//
-	// spheres[3].pos.x = 200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
-	// spheres[3].pos.y = 300;//e->posY;
-	// spheres[3].pos.z = 200 * sin(3 * M_PI / 4 + e->theta);//0;
-	// spheres[3].radius = 60 - (55 * sin(3 * M_PI / 4 + e->theta));//100;
-	// spheres[3].material = 3;
-	//
-	// spheres[4].pos.x = -200 * cos(3 * M_PI / 2 + e->theta);
-	// spheres[4].pos.y = 100;
-	// spheres[4].pos.z = -200 * sin(3 * M_PI / 2 + e->theta);//0;
-	// spheres[4].radius = 35 - (30 * sin(3 * M_PI / 2 + e->theta));//100;
-	// spheres[4].material = 4;
-	//
-	// spheres[5].pos.x = -200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
-	// spheres[5].pos.y = 400;//e->posY;
-	// spheres[5].pos.z = -200 * sin(3 * M_PI / 4 + e->theta);//0;
-	// spheres[5].radius = 60 + (55 * sin(3 * M_PI / 4 + e->theta));//100;
-	// spheres[5].material = 5;
-	//
-	// spheres[6].pos.x = -300 * cos(M_PI / 4 + e->theta);
-	// spheres[6].pos.y = 500;
-	// spheres[6].pos.z = -300 * sin(M_PI / 4 + e->theta);
-	// spheres[6].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
-	// spheres[6].material = 6;
+	t_shape shapes[s_cnt];
+	shapes[0].shape = SPHERE;
+	shapes[0].pos.x = 300 * cos(M_PI / 4 + e->theta);
+	shapes[0].pos.y = 300;
+	shapes[0].pos.z = 300 * sin(M_PI / 4 + e->theta);
+	shapes[0].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
+	shapes[0].material = 0;
+	
+	shapes[1].shape = SPHERE;
+	shapes[1].pos.x = 350 * cos(M_PI / 2 + e->theta);
+	shapes[1].pos.y = 500;
+	shapes[1].pos.z = 350 * sin(M_PI / 2 + e->theta);
+	shapes[1].radius = 50 - (45 * sin(M_PI / 2 + e->theta));
+	shapes[1].material = 1;
+	
+	shapes[2].shape = SPHERE;
+	shapes[2].pos.x = 200 * cos(e->theta);
+	shapes[2].pos.y = 140;
+	shapes[2].pos.z = 200 * sin(e->theta);
+	shapes[2].radius = 25 - (20 * sin(e->theta));
+	shapes[2].material = 2;
+	
+	shapes[3].shape = SPHERE;
+	shapes[3].pos.x = 200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
+	shapes[3].pos.y = 300;//e->posY;
+	shapes[3].pos.z = 200 * sin(3 * M_PI / 4 + e->theta);//0;
+	shapes[3].radius = 60 - (55 * sin(3 * M_PI / 4 + e->theta));//100;
+	shapes[3].material = 3;
+	
+	shapes[4].shape = SPHERE;
+	shapes[4].pos.x = -200 * cos(3 * M_PI / 2 + e->theta);
+	shapes[4].pos.y = 100;
+	shapes[4].pos.z = -200 * sin(3 * M_PI / 2 + e->theta);//0;
+	shapes[4].radius = 35 - (30 * sin(3 * M_PI / 2 + e->theta));//100;
+	shapes[4].material = 4;
+	
+	shapes[5].shape = SPHERE;
+	shapes[5].pos.x = -200 * cos(3 * M_PI / 4 + e->theta);//e->posX;
+	shapes[5].pos.y = 400;//e->posY;
+	shapes[5].pos.z = -200 * sin(3 * M_PI / 4 + e->theta);//0;
+	shapes[5].radius = 60 + (55 * sin(3 * M_PI / 4 + e->theta));//100;
+	shapes[5].material = 5;
+	
+	shapes[6].shape = SPHERE;
+	shapes[6].pos.x = -300 * cos(M_PI / 4 + e->theta);
+	shapes[6].pos.y = 500;
+	shapes[6].pos.z = -300 * sin(M_PI / 4 + e->theta);
+	shapes[6].radius = 75 - (70 * sin(M_PI / 4 + e->theta)) ;
+	shapes[6].material = 6;
 	// //
 	// // spheres[5].pos.x = 600;
 	// // spheres[5].pos.y = 100;
@@ -372,9 +379,9 @@ int ray_tracer(t_env *e)
 
 
 	int y = 0;
-	while(y < HEIGHT)
+	while(y < HEIGHT )
 	{
-		int x = 0;
+		int x =  0;
 		while (x < WIDTH)
 		{
 
@@ -386,9 +393,9 @@ int ray_tracer(t_env *e)
 			float coef = 1.0f;
 
 			//Had this set for sphere rotations
-			// r.start.x = x - (WIDTH / 2);
-			r.start.x = x;// - (WIDTH / 2);//(x - WIDTH / 2) + 0.5f;//(-WIDTH / 2) + x + 0.5;
-			r.start.y = y;// - (HEIGHT / 2);//(y - HEIGHT / 2) + 0.5f; //(HEIGHT / 2) - y + 0.5;
+			r.start.x = x - (WIDTH / 2);
+			// r.start.x = (x - WIDTH / 2);//(-WIDTH / 2) + x + 0.5;
+			r.start.y = y;;//(y - HEIGHT / 2) + 0.5;
 			r.start.z = -2000.0f;
 
 
@@ -496,7 +503,7 @@ int ray_tracer(t_env *e)
 						float b_term = 0.0f;
 						if (bp > 0.001f)
 						{
-							printf("bp = %f\n", bp);
+							// printf("bp = %f\n", bp);
 							blin_dir = vec_scale((1.0f / bp), &blin_dir);
 							b_term = MAX(vec_dot(&blin_dir, &n), 0.0f);
 							b_term = currentMat.reflection * powf(b_term, 16) * coef;
@@ -510,10 +517,10 @@ int ray_tracer(t_env *e)
 						green += lambert * currentLight.intensity.green * currentMat.diffuse.green;
 						blue += lambert * currentLight.intensity.blue * currentMat.diffuse.blue;
 					}
-					// float ambient = 0.01f;
-					// red += ambient;
-					// green += ambient;
-					// blue += ambient;
+					float ambient = 0.01f;
+					red += ambient;
+					green += ambient;
+					blue += ambient;
 				}
 				/* Iterate over the reflection */
 				coef *= currentMat.reflection;
